@@ -1,0 +1,46 @@
+// script.js
+
+// Get the form and response message element
+const emailForm = document.getElementById('emailForm');
+const responseMessage = document.getElementById('responseMessage');
+
+// Listen for form submission
+emailForm.addEventListener('submit', async function(event) {
+    event.preventDefault(); // Prevent the page from reloading upon form submission
+    
+    // Get the email value from the form input
+    const email = document.getElementById('email').value;
+    
+    if (validateEmail(email)) {
+        try {
+            // Send the email to the Azure Function (replace with your actual function URL)
+            const response = await fetch("https://<your-function-app-url>/api/<your-function-name>", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email: email })
+            });
+
+            if (response.ok) {
+                responseMessage.innerText = `Thank you for submitting your email: ${email}. We'll get in touch soon!`;
+            } else {
+                responseMessage.innerText = "Error submitting email.";
+            }
+        } catch (error) {
+            responseMessage.innerText = "Error submitting email.";
+            console.error(error);
+        }
+
+        // Optionally, you can clear the form after submission
+        emailForm.reset();
+    } else {
+        responseMessage.innerText = 'Please enter a valid email address.';
+    }
+});
+
+// Basic email validation function
+function validateEmail(email) {
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return re.test(email);
+}
